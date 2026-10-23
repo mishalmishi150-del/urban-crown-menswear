@@ -1135,3 +1135,234 @@ footer a:hover {
   }
 }
 
+/* =========================================
+   URBAN CROWN - PREMIUM CONTACT SECTION
+========================================= */
+
+.contact-section {
+  position: relative;
+  padding: 90px 7%;
+  overflow: hidden;
+  background: #191816;
+  color: #fffdf9;
+  text-align: center;
+}
+
+.contact-section .eyebrow {
+  margin-bottom: 14px;
+  color: #e5c68b;
+  letter-spacing: 3px;
+}
+
+.contact-section h2 {
+  margin: 0 0 18px;
+  color: #fffdf9;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 5vw, 54px);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.contact-section .contact-intro {
+  max-width: 620px;
+  margin: 0 auto 45px;
+  color: #c9c1b4;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.contact-content {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 45px;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 38px;
+  border: 1px solid #494033;
+  background: #211f1b;
+  text-align: left;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+
+.contact-icon {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  border: 1px solid #b38b4b;
+  color: #e5c68b;
+  font-size: 25px;
+}
+
+.contact-info h3 {
+  margin: 0 0 16px;
+  color: #fffdf9;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.contact-info > p {
+  max-width: 370px;
+  margin: 0 0 30px;
+  color: #c9c1b4;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.contact-highlight {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 22px;
+  border-top: 1px solid #494033;
+}
+
+.contact-highlight span {
+  color: #e5c68b;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.contact-highlight small {
+  color: #b8afa1;
+  font-size: 9px;
+  line-height: 1.8;
+  letter-spacing: 1.5px;
+}
+
+.contact-section .contact-form {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+}
+
+.contact-form label {
+  margin-top: 7px;
+  color: #eee5d7;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.contact-section .contact-form input,
+.contact-section .contact-form textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 14px 15px;
+  border: 1px solid #51483a;
+  border-radius: 0;
+  background: #191816;
+  color: #fffdf9;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.contact-section .contact-form input::placeholder,
+.contact-section .contact-form textarea::placeholder {
+  color: #a49a8b;
+  opacity: 1;
+}
+
+.contact-section .contact-form input:focus,
+.contact-section .contact-form textarea:focus {
+  border-color: #d8b46d;
+  outline: 1px solid #d8b46d;
+}
+
+.contact-section .contact-form textarea {
+  min-height: 135px;
+  resize: vertical;
+}
+
+.contact-section .contact-form .shop-button {
+  align-self: flex-start;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 14px 23px;
+  border: 1px solid #d8b46d;
+  border-radius: 0;
+  background: #d8b46d;
+  color: #191816;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.contact-section .contact-form .shop-button:hover {
+  border-color: #f0d39a;
+  background: #f0d39a;
+}
+
+.contact-section .contact-form .contact-demo-note {
+  margin: 5px 0 0;
+  color: #a49a8b;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.contact-section .form-message {
+  max-width: 1050px;
+  margin: 22px auto 0;
+  color: #e5c68b;
+  text-align: center;
+}
+
+/* TABLET AND MOBILE CONTACT LAYOUT */
+
+@media (max-width: 760px) {
+  .contact-section {
+    padding: 60px 5%;
+  }
+
+  .contact-section .contact-intro {
+    margin-bottom: 30px;
+  }
+
+  .contact-content {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 25px 20px;
+  }
+
+  .contact-info h3 {
+    font-size: 27px;
+  }
+
+  .contact-section .contact-form .shop-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .contact-content {
+    padding: 22px 15px;
+  }
+
+  .contact-section h2 {
+    font-size: 34px;
+  }
+}
+

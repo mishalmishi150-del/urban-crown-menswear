@@ -1149,34 +1149,69 @@ function App() {
         </section>
 
         <section className="contact-section" id="contact">
-          <p className="eyebrow">GET IN TOUCH</p>
-          <h2>Contact Us</h2>
-          <p>
-            Send a sample message using the demo form below.
-            It will not be sent to a real inbox.
+          <p className="eyebrow">WE'RE HERE FOR YOU</p>
+          <h2>Let's Talk Style.</h2>
+
+          <p className="contact-intro">
+            Have a question about our collection? We'd love to hear from you.
+            Send us a message and let's make your style stand out.
           </p>
 
-          <form className="contact-form" onSubmit={submitContact}>
-            <label htmlFor="contact-name">Your name</label>
-            <input id="contact-name" required />
+          <div className="contact-content">
+            <div className="contact-info">
+              <span className="contact-icon">✦</span>
+              <h3>Get in Touch</h3>
 
-            <label htmlFor="contact-email">Email address</label>
-            <input id="contact-email" type="email" required />
+              <p>
+                Your style matters to us. Share your questions, feedback,
+                or thoughts about URBAN CROWN.
+              </p>
 
-            <label htmlFor="contact-message">Message</label>
-            <textarea
-              id="contact-message"
-              value={contactMessage}
-              onChange={(event) => setContactMessage(event.target.value)}
-              required
-            />
+              <div className="contact-highlight">
+                <span>URBAN CROWN</span>
+                <small>MODERN MENSWEAR · EVERYDAY CONFIDENCE</small>
+              </div>
+            </div>
 
-            <button className="shop-button" type="submit">
-              SEND DEMO MESSAGE
-            </button>
-          </form>
+            <form className="contact-form" onSubmit={submitContact}>
+              <label htmlFor="contact-name">Your Name</label>
+              <input
+                id="contact-name"
+                type="text"
+                placeholder="Enter your full name"
+                required
+              />
 
-          {contactStatus && <p className="form-message">{contactStatus}</p>}
+              <label htmlFor="contact-email">Email Address</label>
+              <input
+                id="contact-email"
+                type="email"
+                placeholder="Enter your email address"
+                required
+              />
+
+              <label htmlFor="contact-message">Your Message</label>
+              <textarea
+                id="contact-message"
+                placeholder="How can we help you?"
+                value={contactMessage}
+                onChange={(event) => setContactMessage(event.target.value)}
+                required
+              />
+
+              <button className="shop-button" type="submit">
+                SEND MESSAGE →
+              </button>
+
+              <p className="contact-demo-note">
+                Demo form · Messages are not sent to a real inbox yet.
+              </p>
+            </form>
+          </div>
+
+          {contactStatus && (
+            <p className="form-message">{contactStatus}</p>
+          )}
         </section>
       </main>
 
