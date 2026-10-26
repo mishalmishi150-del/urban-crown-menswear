@@ -1,10 +1,10 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
-const products = [
+const initialProducts = [
   {
     id: 1,
+    mongoId: "6adcbae479a449ca3e263e95",
     name: "Classic Formal Shirt",
     price: 2499,
     category: "SMART CASUAL",
@@ -17,6 +17,7 @@ const products = [
   },
   {
     id: 2,
+    mongoId: "6adcc1e8ec62d34c9f8ba942",
     name: "Essential Jacket",
     price: 4999,
     category: "OUTERWEAR",
@@ -29,6 +30,7 @@ const products = [
   },
   {
     id: 3,
+    mongoId: "6adcc248ec62d34c9f8ba943",
     name: "Classic Leather Shoes",
     price: 3499,
     category: "FOOTWEAR",
@@ -45,59 +47,50 @@ const faqs = [
   {
     question: "How do I place an order?",
     answer:
-      "Choose a product, select your size and colour, add it to your bag, and follow the demo checkout steps.",
+      "Choose a product, select your size and colour, add it to your bag, and complete the checkout form.",
   },
   {
     question: "Can I change my product size?",
     answer:
-      "Choose your preferred size on the product detail page before adding the item to your bag.",
+      "Select your preferred size on the product detail page before adding the item to your bag.",
   },
   {
     question: "How long does delivery take?",
     answer:
-      "Delivery times are not configured in this frontend demo. A real store would provide delivery estimates at checkout.",
+      "Delivery estimates are not configured in this demonstration website.",
   },
   {
     question: "Can I return a product?",
     answer:
-      "Please review the sample Returns Policy below. Actual returns are not available because this is a demo website.",
+      "This is a demo website and does not process real returns.",
   },
   {
     question: "Can I pay online?",
     answer:
-      "No real payments are processed. The checkout is for demonstration purposes only.",
+      "Online payment is not configured. No real payment is processed.",
   },
 ];
 
 function App() {
+  const [products, setProducts] = useState(initialProducts);
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState("");
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [detailSize, setDetailSize] = useState("M");
-  const [detailColor, setDetailColor] = useState("White");
-  const [showSizeGuide, setShowSizeGuide] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
-  const [detailQuantity, setDetailQuantity] = useState(1);
-  const [showAccount, setShowAccount] = useState(false);
-  const [accountMessage, setAccountMessage] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [filterSize, setFilterSize] = useState("all");
   const [filterColor, setFilterColor] = useState("all");
   const [maxPrice, setMaxPrice] = useState("all");
-  const [discountCode, setDiscountCode] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState(false);
-  const [discountMessage, setDiscountMessage] = useState("");
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterMessage, setNewsletterMessage] = useState("");
-  const [contactMessage, setContactMessage] = useState("");
-  const [contactStatus, setContactStatus] = useState("");
-  const [openFaq, setOpenFaq] = useState(0);
-  const [showCookieNotice, setShowCookieNotice] = useState(
-    !sessionStorage.getItem("urban-crown-cookie-choice")
-  );
 
+  const [selections, setSelections] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [detailSize, setDetailSize] = useState("M");
+  const [detailColor, setDetailColor] = useState("White");
+  const [detailQuantity, setDetailQuantity] = useState(1);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [accountMessage, setAccountMessage] = useState("");
+
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
@@ -106,7 +99,71 @@ function App() {
     city: "",
   });
 
-  const [selections, setSelections] = useState({});
+  const [discountCode, setDiscountCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState(false);
+  const [discountMessage, setDiscountMessage] = useState("");
+
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactStatus, setContactStatus] = useState("");
+  const [openFaq, setOpenFaq] = useState(0);
+
+  const [showCookieNotice, setShowCookieNotice] = useState(
+    !sessionStorage.getItem("urban-crown-cookie-choice")
+  );
+
+  useEffect(() => {
+    fetch("https://rim-kooky-bear.abasthan.app/api/products")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Products load nahi huay");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!Array.isArray(data) || data.length === 0) {
+          return;
+        }
+
+        const mappedProducts = data.map((product, index) => {
+          const category = (product.category || "").toUpperCase();
+
+          const isFootwear =
+            category.includes("FOOTWEAR") ||
+            category.includes("SHOES");
+
+          const isJacket =
+            category.includes("JACKET") ||
+            category.includes("OUTERWEAR");
+
+          return {
+            id: index + 1,
+            mongoId: product._id,
+            name: product.name,
+            price: Number(product.price),
+            category,
+            image: product.image,
+            sizes: isFootwear
+              ? ["40", "41", "42", "43", "44"]
+              : ["S", "M", "L", "XL"],
+            colors: isFootwear
+              ? ["Black", "Brown"]
+              : isJacket
+              ? ["Black", "Brown", "Navy"]
+              : ["White", "Black", "Olive Green"],
+            description:
+              product.description || "Premium quality menswear.",
+            material: product.material || "Premium fabric",
+          };
+        });
+
+        setProducts(mappedProducts);
+      })
+      .catch((error) => {
+        console.error("Products fetch error:", error);
+      });
+  }, []);
 
   const cartCount = cart.reduce(
     (sum, item) => sum + item.quantity,
@@ -126,10 +183,12 @@ function App() {
 
   const filteredProducts = products
     .filter((product) => {
-      const matchesSearch =
-        `${product.name} ${product.category} ${product.description}`
-          .toLowerCase()
-          .includes(search.trim().toLowerCase());
+      const searchText =
+        `${product.name} ${product.category} ${product.description}`.toLowerCase();
+
+      const matchesSearch = searchText.includes(
+        search.trim().toLowerCase()
+      );
 
       const matchesSize =
         filterSize === "all" ||
@@ -182,11 +241,15 @@ function App() {
     setDetailSize(selection?.size || product.sizes[0]);
     setDetailColor(selection?.color || product.colors[0]);
     setDetailQuantity(1);
-    setGalleryIndex(0);
     setShowSizeGuide(false);
     setOrderPlaced(false);
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+   setTimeout(() => {
+  document.getElementById("cart")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}, 100);
   }
 
   function closeProduct() {
@@ -238,11 +301,7 @@ function App() {
       color: product.colors[0],
     };
 
-    addToCart(
-      product,
-      selection.size,
-      selection.color
-    );
+    addToCart(product, selection.size, selection.color);
   }
 
   function addDetailProduct() {
@@ -310,26 +369,71 @@ function App() {
     }));
   }
 
-  function handleCheckout(event) {
+  async function handleCheckout(event) {
     event.preventDefault();
 
     if (cart.length === 0) return;
 
-    setOrderPlaced(true);
-    setCart([]);
-    setShowCheckout(false);
-    setAppliedDiscount(false);
-    setDiscountCode("");
-    setDiscountMessage("");
+    try {
+      const response = await fetch(
+        "https://rim-kooky-bear.abasthan.app/api/orders",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerName: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            address: `${customer.address}, ${customer.city}`,
+            items: cart.map((item) => ({
+              productId: item.mongoId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+            })),
+            totalAmount: total,
+          }),
+        }
+      );
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Order save nahi ho saka.");
+        return;
+      }
+
+      setOrderPlaced(true);
+      setCart([]);
+      setShowCheckout(false);
+      setAppliedDiscount(false);
+      setDiscountCode("");
+      setDiscountMessage("");
+
+      setCustomer({
+        name: "",
+        phone: "",
+        email: "",
+        address: "",
+        city: "",
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert(
+        "Backend se connection nahi ho saka. Check karo ke backend server chal raha hai."
+      );
+    }
   }
 
   function subscribeNewsletter(event) {
     event.preventDefault();
 
     setNewsletterMessage(
-      "Thank you! This is a demo signup and no email has been sent."
+      "Thank you! This is a demo signup. No email has been sent."
     );
 
     setNewsletterEmail("");
@@ -353,11 +457,9 @@ function App() {
   function goToCollection() {
     closeProduct();
 
-    setTimeout(() => {
-      document.getElementById("collection")?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }, 0);
+    document.getElementById("collection")?.scrollIntoView({
+      behavior: "smooth",
+    });
   }
 
   return (
@@ -411,9 +513,8 @@ function App() {
                 </h1>
 
                 <p>
-                  Discover premium menswear designed for the
-                  modern man. Look good, feel confident, and
-                  express your own style.
+                  Discover premium menswear designed for the modern man.
+                  Look good, feel confident, and express your own style.
                 </p>
 
                 <button
@@ -542,9 +643,9 @@ function App() {
                     onChange={(event) => setMaxPrice(event.target.value)}
                   >
                     <option value="all">Any price</option>
-                    <option value="3000">Up to Rs. 3,000</option>
-                    <option value="4000">Up to Rs. 4,000</option>
-                    <option value="5000">Up to Rs. 5,000</option>
+                    <option value="2500">Rs. 2,500</option>
+                    <option value="3500">Rs. 3,500</option>
+                    <option value="5000">Rs. 5,000</option>
                   </select>
                 </label>
               </div>
@@ -567,9 +668,7 @@ function App() {
                         <img src={product.image} alt={product.name} />
                       </button>
 
-                      <p className="product-category">
-                        {product.category}
-                      </p>
+                      <p className="product-category">{product.category}</p>
 
                       <button
                         className="product-title-button"
@@ -657,8 +756,8 @@ function App() {
                 <p className="eyebrow">MADE FOR EVERY DAY</p>
                 <h2>Everyday Essentials</h2>
                 <p>
-                  Build your wardrobe with versatile pieces that
-                  work together, season after season.
+                  Build your wardrobe with versatile pieces that work
+                  together, season after season.
                 </p>
                 <button className="shop-button" onClick={goToCollection}>
                   SHOP ESSENTIALS
@@ -721,7 +820,6 @@ function App() {
                   <img
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
-                    key={`${selectedProduct.id}-${galleryIndex}`}
                   />
                 </div>
 
@@ -729,7 +827,6 @@ function App() {
                   <button
                     type="button"
                     className="detail-thumbnail active"
-                    onClick={() => setGalleryIndex(0)}
                     aria-label="Show product image"
                   >
                     <img
@@ -740,8 +837,7 @@ function App() {
                 </div>
 
                 <p className="gallery-note">
-                  Product image gallery. Additional product images can be
-                  added when available.
+                  Additional product images can be added when available.
                 </p>
               </div>
 
@@ -842,15 +938,15 @@ function App() {
                 <div className="detail-trust">
                   <p>✓ Easy product selection</p>
                   <p>✓ Size and colour options</p>
-                  <p>✓ Secure payment not configured in this demo</p>
+                  <p>✓ Online payment is not configured in this demo</p>
                 </div>
 
                 <div className="detail-description-panel">
                   <h3>Product Details</h3>
                   <p>{selectedProduct.description}</p>
                   <p>
-                    Please note: material and product information shown
-                    here is sample content for this website concept.
+                    Material and product information shown here is sample
+                    content for this website concept.
                   </p>
                 </div>
 
@@ -906,10 +1002,10 @@ function App() {
 
           {orderPlaced && (
             <div className="success-message">
-              <h3>Thank you for trying our demo!</h3>
+              <h3>Thank you for your order!</h3>
               <p>
-                This is a sample confirmation only. No real order
-                or payment has been processed.
+                Your order was saved by the backend. No online payment
+                has been processed.
               </p>
             </div>
           )}
@@ -933,6 +1029,7 @@ function App() {
                       >
                         {item.name}
                       </button>
+
                       <p>Size: {item.size}</p>
                       <p>Colour: {item.color}</p>
                       <p>Rs. {item.price.toLocaleString("en-PK")}</p>
@@ -941,7 +1038,6 @@ function App() {
                         <button
                           type="button"
                           onClick={() => changeQuantity(item.key, -1)}
-                          aria-label={`Decrease ${item.name} quantity`}
                         >
                           −
                         </button>
@@ -949,7 +1045,6 @@ function App() {
                         <button
                           type="button"
                           onClick={() => changeQuantity(item.key, 1)}
-                          aria-label={`Increase ${item.name} quantity`}
                         >
                           +
                         </button>
@@ -1053,12 +1148,11 @@ function App() {
                   />
 
                   <p className="demo-notice">
-                    Demo only: this form does not send your details
-                    to a server and does not process payments.
+                    No online payment is processed in this demo.
                   </p>
 
                   <button className="shop-button" type="submit">
-                    PLACE DEMO ORDER
+                    PLACE ORDER
                   </button>
                 </form>
               )}
@@ -1071,9 +1165,7 @@ function App() {
           <h2>Confidence In Every Detail</h2>
           <p>
             URBAN CROWN is a menswear website concept focused on modern
-            essentials, simple design, and everyday style. Our goal is
-            to make exploring a wardrobe collection straightforward
-            and enjoyable.
+            essentials, simple design, and everyday style.
           </p>
           <button className="shop-button" onClick={goToCollection}>
             EXPLORE OUR COLLECTION
@@ -1086,7 +1178,7 @@ function App() {
           <p>
             This demo does not dispatch real orders. A live store should
             specify delivery areas, shipping charges, estimated delivery
-            times, and tracking information before accepting orders.
+            times, and tracking information.
           </p>
         </section>
 
@@ -1095,8 +1187,8 @@ function App() {
           <h2>Returns Policy</h2>
           <p>
             This demo does not accept real returns. A live store should
-            clearly explain return eligibility, time limits, product
-            condition requirements, and the refund process.
+            explain return eligibility, time limits, product condition
+            requirements, and the refund process.
           </p>
         </section>
 
@@ -1104,9 +1196,8 @@ function App() {
           <p className="eyebrow">PLEASE READ</p>
           <h2>Terms & Conditions</h2>
           <p>
-            URBAN CROWN is currently a frontend demonstration. Product
-            prices, descriptions, checkout and confirmation messages
-            are illustrative and do not create a real purchase.
+            URBAN CROWN is a demonstration website. Product prices,
+            descriptions and checkout are illustrative.
           </p>
         </section>
 
@@ -1114,10 +1205,9 @@ function App() {
           <p className="eyebrow">YOUR INFORMATION</p>
           <h2>Privacy Policy</h2>
           <p>
-            This frontend demo does not submit checkout, contact, or
-            newsletter details to a server. A production store needs a
-            complete privacy policy explaining data collection, use,
-            storage, consent, and customer rights.
+            This demo sends checkout details to the configured backend.
+            A production store should provide a complete privacy policy
+            explaining data collection, use, storage, consent and rights.
           </p>
         </section>
 
@@ -1154,17 +1244,14 @@ function App() {
 
           <p className="contact-intro">
             Have a question about our collection? We'd love to hear from you.
-            Send us a message and let's make your style stand out.
           </p>
 
           <div className="contact-content">
             <div className="contact-info">
               <span className="contact-icon">✦</span>
               <h3>Get in Touch</h3>
-
               <p>
-                Your style matters to us. Share your questions, feedback,
-                or thoughts about URBAN CROWN.
+                Share your questions, feedback, or thoughts about URBAN CROWN.
               </p>
 
               <div className="contact-highlight">
@@ -1343,18 +1430,17 @@ function App() {
             <p className="eyebrow">WELCOME TO URBAN CROWN</p>
             <h2 id="account-title">Your Account</h2>
             <p>
-              Account registration and login require a backend service.
-              This demo does not create or authenticate accounts.
+              Account registration and login are not configured in this demo.
             </p>
 
             <button
               className="shop-button"
               type="button"
-              onClick={() => {
+              onClick={() =>
                 setAccountMessage(
                   "Demo only: account registration is not connected."
-                );
-              }}
+                )
+              }
             >
               CREATE ACCOUNT
             </button>
@@ -1362,11 +1448,11 @@ function App() {
             <button
               className="shop-button secondary-button"
               type="button"
-              onClick={() => {
+              onClick={() =>
                 setAccountMessage(
-                  "Demo only: login is not connected to an authentication service."
-                );
-              }}
+                  "Demo only: login is not connected."
+                )
+              }
             >
               LOG IN
             </button>
@@ -1383,9 +1469,8 @@ function App() {
           <div>
             <strong>Your privacy matters</strong>
             <p>
-              This demo uses session storage to remember your cookie
-              notice choice for this browser session. It does not use
-              an advertising or analytics tracker.
+              This demo remembers your cookie notice choice for the
+              current browser session.
             </p>
           </div>
 

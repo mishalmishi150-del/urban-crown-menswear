@@ -1,6 +1,5 @@
 
-require("node:dns").setServers(["1.1.1.1", "8.8.8.8"]);
-
+require("node:dns").setServers(["8.8.8.8", "1.1.1.1"]);
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -29,18 +28,23 @@ app.get("/api/test", (req, res) => {
   });
 });
 
+// Database status
+app.get("/api/db-status", (req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+
+  res.status(connected ? 200 : 503).json({
+    success: connected,
+    database: connected ? "Connected" : "Not connected"
+  });
+});
+
 // Get all products
 app.get("/api/products", async (req, res) => {
   try {
     const products = await Product.find();
-
-    res.json({
-      success: true,
-      products
-    });
+    res.json({ success: true, products });
   } catch (error) {
     console.error("Products fetch error:", error.message);
-
     res.status(500).json({
       success: false,
       message: "Products fetch nahi ho sake."
@@ -52,14 +56,9 @@ app.get("/api/products", async (req, res) => {
 app.post("/api/products", async (req, res) => {
   try {
     const product = await Product.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      product
-    });
+    res.status(201).json({ success: true, product });
   } catch (error) {
     console.error("Product create error:", error.message);
-
     res.status(400).json({
       success: false,
       message: error.message
@@ -71,14 +70,9 @@ app.post("/api/products", async (req, res) => {
 app.get("/api/orders", async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      orders
-    });
+    res.json({ success: true, orders });
   } catch (error) {
-    console.error("Orders fetch error:", error);
-
+    console.error("Orders fetch error:", error.message);
     res.status(500).json({
       success: false,
       message: "Orders fetch nahi ho sake."
@@ -90,15 +84,13 @@ app.get("/api/orders", async (req, res) => {
 app.post("/api/orders", async (req, res) => {
   try {
     const order = await Order.create(req.body);
-
     res.status(201).json({
       success: true,
       message: "Order successfully save ho gaya!",
       order
     });
   } catch (error) {
-    console.error("Order create error:", error);
-
+    console.error("Order create error:", error.message);
     res.status(400).json({
       success: false,
       message: error.message
@@ -106,25 +98,21 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// Connect to MongoDB and start server
-async function startServer() {
-  try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error("MONGODB_URI .env file mein nahi mila.");
-    }
+// Start server first so hosting can detect its port
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`URBAN CROWN backend running on port ${PORT}`);
 
-    await mongoose.connect(process.env.MONGODB_URI, {
-      family: 4
-    });
-
-    console.log("MongoDB connected successfully!");
-
-    app.listen(PORT, () => {
-      console.log(`URBAN CROWN backend running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Backend startup error:", error.message);
+  // Connect to MongoDB after the server starts
+  if (!process.env.MONGODB_URI) {
+    console.error("MONGODB_URI environment variable missing!");
+    return;
   }
-}
 
-startServer();
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log("MongoDB connected successfully!");
+    })
+    .catch((error) => {
+      console.error("MongoDB connection error:", error.message);
+    });
+});
